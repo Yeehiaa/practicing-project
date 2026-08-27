@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { Task } from "./task.interface";
 
 @Injectable()
@@ -11,5 +11,16 @@ export class TasksService {
 
     getTasks(): Task[] {
         return this.tasks;
+    }
+
+    getTaskById(id: number): Task  {
+        // Here i used find to get the task which have the id with the same id as the one passed in the parameter
+        const task = this.tasks.find(task => task.id === id);
+        console.log("tasks", typeof this.tasks);
+        console.log("task", typeof task);
+        if (!task) {
+            throw new NotFoundException(`Task with id ${id} not found`);
+        }
+        return task;
     }
 }

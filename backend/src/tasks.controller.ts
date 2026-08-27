@@ -4,9 +4,9 @@
 // this "tasks.controller.ts" handles any requests related to tasks from getting the tasks to creating, updating, and deleting them
 
 
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
-import { Task } from "./task.interface";
+import type { Task } from "./task.interface";
 
 
 @Controller("tasks")
@@ -16,5 +16,10 @@ export class TasksController {
     @Get()
     getTasks(): Task[] {
         return this.tasksService.getTasks();
+    }
+
+    @Get(":id")
+    getTaskById( @Param("id", ParseIntPipe) id: number): Task {
+        return this.tasksService.getTaskById(id);
     }
 }
