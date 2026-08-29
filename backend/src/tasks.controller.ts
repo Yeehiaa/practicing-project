@@ -4,7 +4,7 @@
 // this "tasks.controller.ts" handles any requests related to tasks from getting the tasks to creating, updating, and deleting them
 
 
-import { Controller, Get, Param, ParseIntPipe } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import type { Task } from "./task.interface";
 
@@ -18,8 +18,18 @@ export class TasksController {
         return this.tasksService.getTasks();
     }
 
+    // this @Param decorator is used to get the extra thing after
+    // tasks/---- which is the id and put it in the parameter of the method
+    // which is a typescript thing
     @Get(":id")
-    getTaskById( @Param("id", ParseIntPipe) id: number): Task {
+    getTaskById(@Param("id", ParseIntPipe) id: number): Task {
         return this.tasksService.getTaskById(id);
+    }
+     
+    // this @Body decorator is used to get the body of the Post request
+    // and use it as the parameter of the method which is a typescript thing
+    @Post()
+    createTask(@Body() task: Omit<Task, 'id'>): Task {
+        return this.tasksService.createTask(task);
     }
 }

@@ -23,4 +23,16 @@ export class TasksService {
         }
         return task;
     }
+    
+    // this method takes a task object as a parameter
+    // and map to get the highest id in the current tasks and then add 1 to 
+    // create the new task id 
+    createTask(task: Omit<Task, 'id'>): Task {
+        const tasksIds: number[] = this.tasks.map(task => task.id)
+        const id = Math.max(...tasksIds) + 1;
+        const newTask = {id , ...task};
+        this.tasks.push(newTask);
+      return newTask;
+    }
+
 }
