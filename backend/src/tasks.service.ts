@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PartialTask, Task, TaskWithoutId } from "./task.interface";
+import { Task } from "./task.interface";
+import { CreateTaskDto } from "./create-task.dto";
+import { UpdateTaskDto } from "./update-task.dto";
 
 @Injectable()
 export class TasksService {
@@ -25,7 +27,7 @@ export class TasksService {
     // this method takes a task object as a parameter
     // and map to get the highest id in the current tasks and then add 1 to 
     // create the new task id 
-    createTask(task: TaskWithoutId): Task {
+    createTask(task: CreateTaskDto): Task {
         const tasksIds: number[] = this.tasks.map(task => task.id)
         const id = Math.max(0, ...tasksIds) + 1;
         const newTask = {id , ...task};
@@ -36,7 +38,7 @@ export class TasksService {
     // this method takes the specific task id which we want to update
     // and then searchs for it using the exisiting task finder by id 
     // and then searchs for the exisiting task index and then updates it with the new data 
-    updateTask(id: number, task: PartialTask): Task {
+    updateTask(id: number, task: UpdateTaskDto): Task {
     const updatedTask ={...this.getTaskById(id), ...task};
     const taskIndex = this.tasks.findIndex(exisitingTask => exisitingTask.id === id);
     this.tasks[taskIndex] = updatedTask;

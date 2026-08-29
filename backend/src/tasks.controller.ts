@@ -6,7 +6,9 @@
 
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, HttpCode } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
-import type { PartialTask, Task, TaskWithoutId } from "./task.interface";
+import type { Task } from "./task.interface";
+import { CreateTaskDto } from "./create-task.dto";
+import { UpdateTaskDto } from "./update-task.dto";
 
 
 @Controller("tasks")
@@ -29,7 +31,7 @@ export class TasksController {
     // this @Body decorator is used to get the body of the Post request
     // and use it as the parameter of the method which is a typescript thing
     @Post()
-    createTask(@Body() task: TaskWithoutId): Task {
+    createTask(@Body() task: CreateTaskDto): Task {
         return this.tasksService.createTask(task);
     }
 
@@ -37,7 +39,7 @@ export class TasksController {
     // it knows the specific task by the id given in it
     // and updates the @Body data in it
     @Patch(":id")
-    updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: PartialTask): Task {
+    updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: UpdateTaskDto): Task {
         return this.tasksService.updateTask(id, task);
     }
 
