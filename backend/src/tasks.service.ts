@@ -29,10 +29,15 @@ export class TasksService {
     // create the new task id 
     createTask(task: Omit<Task, 'id'>): Task {
         const tasksIds: number[] = this.tasks.map(task => task.id)
-        const id = Math.max(...tasksIds) + 1;
+        const id = Math.max(0, ...tasksIds) + 1;
         const newTask = {id , ...task};
         this.tasks.push(newTask);
       return newTask;
     }
-
+    updateTask(id: number, task: Partial<Omit<Task, 'id'>>): Task {
+    const updatedTask ={...this.getTaskById(id), ...task};
+    const taskIndex = this.tasks.findIndex(exisitingTask => exisitingTask.id === id);
+    this.tasks[taskIndex] = updatedTask;
+    return updatedTask;
+    }
 }

@@ -4,7 +4,7 @@
 // this "tasks.controller.ts" handles any requests related to tasks from getting the tasks to creating, updating, and deleting them
 
 
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import type { Task } from "./task.interface";
 
@@ -31,5 +31,15 @@ export class TasksController {
     @Post()
     createTask(@Body() task: Omit<Task, 'id'>): Task {
         return this.tasksService.createTask(task);
+    }
+
+    // this @Patch is used to update an exisiting task
+    // it knows the specific task by the id given in it
+    // and updates the @Body data in it
+    // Omit<Task, 'id'> is used to make sure the body is : {title: string, description: string}
+    // Partial<Omit<Task, 'id'>> is used to make sure the body is : {title?: string, description?: string}
+    @Patch(":id")
+    updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: Partial<Omit<Task, 'id'>>): Task {
+        return this.tasksService.updateTask(id, task);
     }
 }
