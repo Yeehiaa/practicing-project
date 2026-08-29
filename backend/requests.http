@@ -12,3 +12,6 @@ PATCH http://localhost:3000/tasks/4
 Content-Type: application/json
 
 { "title": "Buy milk and eggs" }
+
+###
+DELETE http://localhost:3000/tasks/2

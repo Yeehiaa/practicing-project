@@ -4,9 +4,9 @@
 // this "tasks.controller.ts" handles any requests related to tasks from getting the tasks to creating, updating, and deleting them
 
 
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, HttpCode } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
-import type { Task } from "./task.interface";
+import type { PartialTask, Task, TaskWithoutId } from "./task.interface";
 
 
 @Controller("tasks")
@@ -29,17 +29,21 @@ export class TasksController {
     // this @Body decorator is used to get the body of the Post request
     // and use it as the parameter of the method which is a typescript thing
     @Post()
-    createTask(@Body() task: Omit<Task, 'id'>): Task {
+    createTask(@Body() task: TaskWithoutId): Task {
         return this.tasksService.createTask(task);
     }
 
     // this @Patch is used to update an exisiting task
     // it knows the specific task by the id given in it
     // and updates the @Body data in it
-    // Omit<Task, 'id'> is used to make sure the body is : {title: string, description: string}
-    // Partial<Omit<Task, 'id'>> is used to make sure the body is : {title?: string, description?: string}
     @Patch(":id")
-    updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: Partial<Omit<Task, 'id'>>): Task {
+    updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: PartialTask): Task {
         return this.tasksService.updateTask(id, task);
     }
+
+    @Delete(":id")
+    @HttpCode(204)
+    deleteTask(@Param("id", ParseIntPipe) id: number): void {
+        this.tasksService.deleteTask(id);
+    }   
 }
