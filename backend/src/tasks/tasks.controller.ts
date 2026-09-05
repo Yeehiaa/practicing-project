@@ -16,7 +16,7 @@ export class TasksController {
     constructor(private readonly tasksService: TasksService) { }
 
     @Get()
-    getTasks(): Task[] {
+    async getTasks(): Promise<Task[]> {
         return this.tasksService.getTasks();
     }
 
@@ -24,14 +24,14 @@ export class TasksController {
     // tasks/---- which is the id and put it in the parameter of the method
     // which is a typescript thing
     @Get(":id")
-    getTaskById(@Param("id", ParseIntPipe) id: number): Task {
+    async getTaskById(@Param("id", ParseIntPipe) id: number): Promise<Task> {
         return this.tasksService.getTaskById(id);
     }
      
     // this @Body decorator is used to get the body of the Post request
     // and use it as the parameter of the method which is a typescript thing
     @Post()
-    createTask(@Body() task: CreateTaskDto): Task {
+    async createTask(@Body() task: CreateTaskDto): Promise<Task> {
         return this.tasksService.createTask(task);
     }
 
@@ -39,13 +39,13 @@ export class TasksController {
     // it knows the specific task by the id given in it
     // and updates the @Body data in it
     @Patch(":id")
-    updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: UpdateTaskDto): Task {
+    async updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: UpdateTaskDto): Promise<Task> {
         return this.tasksService.updateTask(id, task);
     }
 
     @Delete(":id")
     @HttpCode(204)
-    deleteTask(@Param("id", ParseIntPipe) id: number): void {
-        this.tasksService.deleteTask(id);
+    async deleteTask(@Param("id", ParseIntPipe) id: number): Promise<void> {
+         return this.tasksService.deleteTask(id);
     }   
 }

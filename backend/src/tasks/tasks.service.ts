@@ -1,61 +1,83 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { Task } from "./task.interface";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
+import { SupabaseService } from "src/supabase/supabase.service";
+
 
 @Injectable()
 export class TasksService {
-    private tasks: Task[] = [
-        { id: 1, title: "Task 1", description: "Task 1 description" },
-        { id: 2, title: "Task 2", description: "Task 2 description" },
-        { id: 3, title: "Task 3", description: "Task 3 description" },
-    ]
+    constructor(private readonly supabaseService: SupabaseService) { }
 
-    getTasks(): Task[] {
-        return this.tasks;
+    async getTasks(): Promise<Task[]> {
+        const { data, error } = await this.supabaseService
+            .getClient()
+            .from('tasks')
+            .select('*');
+
+        if (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+
+        return data;
     }
 
-    getTaskById(id: number): Task  {
-        // Here i used find to get the task which have the id with the same id as the one passed in the parameter
-        const task = this.tasks.find(task => task.id === id);
-        if (!task) {
+    async getTaskById(id: number): Promise<Task> {
+        const { data, error } = await this.supabaseService
+            .getClient()
+            .from('tasks')
+            .select('*')
+            .eq('id', id)
+            .single()
+
+        if (error) {
+            throw new NotFoundException(`Task with id ${id} not found`)
+        }
+
+        return data;
+    }
+
+    async createTask(task: CreateTaskDto) {
+        const { data, error } = await this.supabaseService
+            .getClient()
+            .from('tasks')
+            .insert(task)
+            .select('*')
+            .single();
+
+        if (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+        return data;
+    }
+
+    async updateTask(id: number, task: UpdateTaskDto) {
+        const { data, error } = await this.supabaseService
+            .getClient()
+            .from('tasks')
+            .update(task)
+            .eq('id', id)
+            .select('*')
+            .single();
+
+        if (error) {
             throw new NotFoundException(`Task with id ${id} not found`);
         }
-        return task;
-    }
-    
-    // this method takes a task object as a parameter
-    // and map to get the highest id in the current tasks and then add 1 to 
-    // create the new task id 
-    createTask(task: CreateTaskDto): Task {
-        const tasksIds: number[] = this.tasks.map(task => task.id)
-        const id = Math.max(0, ...tasksIds) + 1;
-        const newTask = {id , ...task};
-        this.tasks.push(newTask);
-      return newTask;
+        return data;
     }
 
-    // this method takes the specific task id which we want to update
-    // and then searchs for it using the exisiting task finder by id 
-    // and then searchs for the exisiting task index and then updates it with the new data 
-    updateTask(id: number, task: UpdateTaskDto): Task {
-    const updatedTask ={...this.getTaskById(id), ...task};
-    const taskIndex = this.tasks.findIndex(exisitingTask => exisitingTask.id === id);
-    this.tasks[taskIndex] = updatedTask;
-    return updatedTask;
+    async deleteTask(id: number) {
+        const { data, error } = await this.supabaseService
+            .getClient()
+            .from('tasks')
+            .delete()
+            .eq('id', id)
+            .select('*')
+            .single();
+
+        if (error) {
+            throw new NotFoundException(`Task with id ${id} not found`);
+        }
     }
 
-    deleteTask(id: number): void {
-    this.getTaskById(id)
-    this.tasks = this.tasks.filter(t => t.id !== id)
-    }
-
-    // or we can use : 
-
-    // deleteTask(id: number) {
-    // this.getTaskById(id)
-    // const taskIndex = this.tasks.findIndex(exisitingTask => exisitingTask.id === id);
-    // this.tasks.splice(taskIndex, 1)
-    // return this.tasks;
-    // } 
 }
